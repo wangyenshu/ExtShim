@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "API behaviour probe",
+  "version": "1.0",
+  "action": { "default_title": "probe" },
+  "background": { "service_worker": "bg.js" },
+  "devtools_page": "devtools.html",
+  "tts_engine": { "voices": [{ "voice_name": "Probe Voice", "lang": "en-US", "event_types": ["start", "end"] }] },
+  "declarative_net_request": { "rule_resources": [{ "id": "static1", "enabled": true, "path": "rules.json" }] },
+  "content_scripts": [{ "matches": ["<all_urls>"], "js": ["cs.js"], "run_at": "document_idle" }],
+  "permissions": ["bookmarks", "history", "topSites", "sessions", "readingList", "tabGroups", "privacy", "contentSettings", "fontSettings",
+    "cookies", "browsingData", "webRequest", "webRequestBlocking", "declarativeNetRequest", "declarativeNetRequestFeedback", "declarativeContent",
+    "userScripts", "find", "theme", "pageCapture", "power", "system.cpu", "system.memory", "system.storage", "system.display", "publicSuffix",
+    "debugger", "identity", "gcm", "tts", "ttsEngine", "webAuthenticationProxy", "input", "audio", "enterprise.platformKeys", "management",
+    "search", "contextualIdentities", "scripting", "storage", "tabs"],
+  "host_permissions": ["<all_urls>"]
+}

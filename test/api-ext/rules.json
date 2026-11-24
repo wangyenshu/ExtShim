@@ -1,0 +1,5 @@
+[
+  { "id": 1, "priority": 1, "action": { "type": "block" }, "condition": { "urlFilter": "/dnr-block/", "resourceTypes": ["xmlhttprequest", "image", "script"] } },
+  { "id": 2, "priority": 1, "action": { "type": "redirect", "redirect": { "regexSubstitution": "/echo?redirected=\\1" } }, "condition": { "regexFilter": "/dnr-redirect/(\\w+)", "resourceTypes": ["xmlhttprequest"] } },
+  { "id": 3, "priority": 1, "action": { "type": "modifyHeaders", "requestHeaders": [{ "header": "X-DNR", "operation": "set", "value": "yes" }], "responseHeaders": [{ "header": "X-DNR-Response", "operation": "set", "value": "added" }] }, "condition": { "urlFilter": "/echo?dnrhdr", "resourceTypes": ["xmlhttprequest"] } }
+]

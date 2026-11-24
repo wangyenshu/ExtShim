@@ -1,0 +1,10 @@
+body { width: 280px; margin: 0; padding: 12px 14px; font: 13px/1.4 system-ui, sans-serif; color: #222; background: #fff; }
+header { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+h1 { font-size: 15px; margin: 0; }
+form { display: flex; gap: 6px; }
+input#term { flex: 1; padding: 6px 8px; border: 1px solid #ccc; border-radius: 6px; }
+button { padding: 6px 10px; border: 0; border-radius: 6px; background: #ffd43b; font-weight: 600; cursor: pointer; }
+.row { display: flex; justify-content: space-between; align-items: center; margin: 8px 0; }
+.muted { color: #666; min-height: 1.4em; margin: 8px 0; }
+footer { border-top: 1px solid #eee; padding-top: 8px; color: #888; }
+a { color: #1a73e8; }

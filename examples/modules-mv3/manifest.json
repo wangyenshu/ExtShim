@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Module Notes",
+  "version": "2.0.0",
+  "description": "ES-module service worker, module popup, side panel and an offscreen document.",
+  "icons": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
+  "action": { "default_title": "Module Notes", "default_popup": "popup.html" },
+  "side_panel": { "default_path": "sidepanel.html" },
+  "background": { "service_worker": "sw.js", "type": "module" },
+  "permissions": ["storage", "sidePanel", "offscreen", "scripting"]
+}

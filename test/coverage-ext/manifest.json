@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "API coverage probe",
+  "version": "1.0",
+  "action": { "default_title": "probe" },
+  "side_panel": { "default_path": "page.html" },
+  "options_ui": { "page": "page.html" },
+  "omnibox": { "keyword": "probe" },
+  "devtools_page": "devtools.html",
+  "background": { "service_worker": "bg.js" },
+  "tts_engine": { "voices": [{ "voice_name": "Probe Voice", "lang": "en-US", "event_types": ["start", "end"] }] },
+  "declarative_net_request": { "rule_resources": [{ "id": "rules1", "enabled": true, "path": "rules.json" }] },
+  "permissions": [
+    "activeTab", "alarms", "audio", "background", "bookmarks", "browsingData", "certificateProvider", "clipboardRead", "clipboardWrite",
+    "contentSettings", "contextMenus", "cookies", "debugger", "declarativeContent", "declarativeNetRequest", "declarativeNetRequestWithHostAccess",
+    "declarativeNetRequestFeedback", "dns", "desktopCapture", "documentScan", "downloads", "downloads.open", "downloads.ui",
+    "enterprise.deviceAttributes", "enterprise.hardwarePlatform", "enterprise.networkingAttributes", "enterprise.platformKeys", "enterprise.login",
+    "fileBrowserHandler", "fileSystemProvider", "fontSettings", "gcm", "geolocation", "history", "identity", "identity.email", "idle", "input",
+    "loginState", "management", "nativeMessaging", "notifications", "offscreen", "pageCapture", "platformKeys", "power", "printerProvider",
+    "printing", "printingMetrics", "privacy", "processes", "proxy", "readingList", "scripting", "search", "sessions", "sidePanel", "storage",
+    "system.cpu", "system.display", "system.memory", "system.storage", "systemLog", "tabCapture", "tabGroups", "tabs", "topSites", "tts", "ttsEngine",
+    "unlimitedStorage", "userScripts", "vpnProvider", "wallpaper", "webAuthenticationProxy", "webNavigation", "webRequest", "webRequestBlocking",
+    "webRequestAuthProvider", "accessibilityFeatures.read", "accessibilityFeatures.modify", "favicon",
+    "menus", "contextualIdentities", "browserSettings", "captivePortal", "find", "theme", "pkcs11", "telemetry", "networkStatus",
+    "activityLog", "geckoProfiler", "normandyAddonStudy", "urlbar", "mozillaAddons", "mimeHandler", "publicSuffix"
+  ],
+  "host_permissions": ["<all_urls>"]
+}

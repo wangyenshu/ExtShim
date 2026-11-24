@@ -1,0 +1,13 @@
+{
+  "extName": { "message": "Word Highlighter" },
+  "extDescription": { "message": "Highlight words on any page." },
+  "actionTitle": { "message": "Highlight words" },
+  "cmdClear": { "message": "Clear all highlights" },
+  "menuHighlight": { "message": "Highlight “%s”" },
+  "menuClear": { "message": "Clear highlights" },
+  "popupHeading": { "message": "Highlight a word" },
+  "popupButton": { "message": "Highlight" },
+  "matches": { "message": "$COUNT$ matches", "placeholders": { "count": { "content": "$1" } } },
+  "notifTitle": { "message": "Highlighted" },
+  "notifBody": { "message": "Found $1 matches for “$2”." }
+}

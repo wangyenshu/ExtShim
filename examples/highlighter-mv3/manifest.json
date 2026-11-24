@@ -1,0 +1,30 @@
+{
+  // Comments are allowed in manifest.json, like in Chrome.
+  "manifest_version": 3,
+  "name": "__MSG_extName__",
+  "description": "__MSG_extDescription__",
+  "version": "1.2.0",
+  "default_locale": "en",
+  "icons": { "16": "icons/icon16.png", "32": "icons/icon32.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "__MSG_actionTitle__",
+    "default_icon": { "16": "icons/icon16.png", "32": "icons/icon32.png" }
+  },
+  "options_ui": { "page": "options/options.html", "open_in_tab": false },
+  "background": { "service_worker": "background.js" },
+  "permissions": ["storage", "contextMenus", "scripting", "activeTab", "notifications", "alarms"],
+  "host_permissions": ["<all_urls>"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/highlight-lib.js", "content/content.js"],
+      "css": ["content/content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "commands": {
+    "_execute_action": { "suggested_key": { "default": "Alt+Shift+H" } },
+    "clear-highlights": { "suggested_key": { "default": "Alt+Shift+C" }, "description": "__MSG_cmdClear__" }
+  }
+}

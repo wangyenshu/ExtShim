@@ -1,0 +1,7 @@
+{
+  "extName": { "message": "Surligneur" },
+  "extDescription": { "message": "Surlignez des mots sur n'importe quelle page." },
+  "popupHeading": { "message": "Surligner un mot" },
+  "popupButton": { "message": "Surligner" },
+  "matches": { "message": "$COUNT$ résultats", "placeholders": { "count": { "content": "$1" } } }
+}

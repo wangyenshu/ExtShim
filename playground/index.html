@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ExtShim playground</title>
+<style>
+:root { color-scheme: light dark; --fg:#1d1d1f; --mut:#6b6b70; --bd:#dcdce2; --card:#f7f7f9; --acc:#1a73e8; --ok:#188038; --bad:#c5221f; }
+@media (prefers-color-scheme: dark) { :root { --fg:#ececf0; --mut:#a0a0aa; --bd:#34353b; --card:#1b1c20; --acc:#8ab4f8; --ok:#81c995; --bad:#f28b82; } }
+* { box-sizing: border-box; }
+body { font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--fg); margin: 0; }
+main { max-width: 920px; margin: 0 auto; padding: 36px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 4px; letter-spacing: -.01em; }
+h2 { font-size: 17px; margin: 34px 0 10px; }
+.lede { color: var(--mut); margin: 0 0 24px; }
+#drop { border: 2px dashed var(--bd); border-radius: 14px; padding: 34px 20px; text-align: center; transition: .15s; background: var(--card); }
+#drop.over { border-color: var(--acc); background: color-mix(in srgb, var(--acc) 8%, transparent); }
+#drop p { margin: 0 0 14px; }
+button, .btn { font: inherit; font-size: 14px; padding: 8px 14px; border-radius: 9px; border: 1px solid var(--bd); background: transparent; color: var(--fg); cursor: pointer; text-decoration: none; display: inline-block; }
+button.primary, .btn.primary { background: var(--acc); border-color: var(--acc); color: #fff; font-weight: 600; }
+button:disabled { opacity: .5; cursor: default; }
+label.opt { display: inline-flex; gap: 7px; align-items: center; font-size: 14px; color: var(--mut); margin-top: 14px; }
+#status { min-height: 1.5em; margin-top: 12px; font-size: 14px; }
+#status.err { color: var(--bad); } #status.ok { color: var(--ok); }
+.ext { border: 1px solid var(--bd); border-radius: 12px; padding: 14px 16px; margin: 10px 0; display: grid; gap: 10px; }
+.ext header { display: flex; gap: 12px; align-items: center; }
+.ext header canvas, .ext header img { width: 36px; height: 36px; border-radius: 8px; }
+.ext .name { font-weight: 650; } .ext .meta { color: var(--mut); font-size: 13px; }
+.ext .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.bm { background: #fbbc04; color: #202124; border-color: #fbbc04; font-weight: 650; cursor: grab; }
+.note { font-size: 13px; color: var(--mut); }
+.warn { font-size: 13px; color: var(--bad); margin: 0; padding-left: 18px; }
+#sample { border: 1px solid var(--bd); border-radius: 12px; padding: 18px 20px; }
+#sample img { width: 64px; vertical-align: middle; border-radius: 8px; }
+code { font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--card); padding: 1px 5px; border-radius: 5px; }
+</style>
+<script id="extshim-runtime" src="../dist/extshim.min.js"></script>
+<script id="extshim-builder" src="../dist/extshim-builder.js"></script>
+</head>
+<body>
+<main>
+  <h1>ExtShim playground</h1>
+  <p class="lede">Loads an extension into this page and builds a bookmarklet, a userscript or a script file. Files are processed locally.</p>
+
+  <section id="drop">
+    <p>Drop an extension directory, <code>.zip</code>, <code>.crx</code> or <code>.xpi</code>.</p>
+    <button class="primary" id="pickDir">Select directory</button>
+    <button id="pickFile">Select file</button>
+    <input id="dirInput" type="file" webkitdirectory hidden>
+    <input id="fileInput" type="file" accept=".zip,.crx,.xpi,application/zip" hidden>
+    <div><label class="opt"><input id="anyPage" type="checkbox" checked> Ignore content script match patterns</label></div>
+    <div id="status"></div>
+  </section>
+
+  <section id="loaded"></section>
+
+  <h2>Sample content</h2>
+  <div id="sample">
+    <h3>The quick brown fox</h3>
+    <p>The quick brown fox jumps over the lazy dog. Context menu: Alt + right-click.</p>
+    <p><a href="https://example.com/">example.com</a> <input placeholder="Input">
+      <img alt="sample" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231a73e8'/%3E%3Ccircle cx='32' cy='32' r='14' fill='white'/%3E%3C/svg%3E"></p>
+    <ul><li>Alpha</li><li>Beta</li><li>Gamma</li></ul>
+    <table><tr><th>Name</th><th>Value</th></tr><tr><td>Foo</td><td>42</td></tr></table>
+  </div>
+</main>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var status = $('status');
+  var say = function (t, cls) { status.textContent = t; status.className = cls || ''; };
+  var runtimeSource = null;
+  function getRuntimeSource() {
+    if (runtimeSource) return Promise.resolve(runtimeSource);
+    var tag = $('extshim-runtime');
+    if (tag.textContent.trim()) return Promise.resolve(runtimeSource = tag.textContent);
+    return fetch(tag.src).then(function (r) { return r.text(); }).then(function (t) { return (runtimeSource = t); });
+  }
+  function fmt(n) { return n > 1048576 ? (n / 1048576).toFixed(2) + ' MB' : (n / 1024).toFixed(1) + ' KB'; }
+  function download(name, text, type) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type: type || 'text/javascript' }));
+    a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+
+  async function handle(source) {
+    try {
+      say('Reading files');
+      var files = await ExtShimBuilder.collectFiles(source);
+      say('Starting');
+      var ext = await ExtShim.load(files, { contentScripts: $('anyPage').checked ? 'all' : 'manifest' });
+      say('Running: ' + ext.name, 'ok');
+      render(ext, files);
+    } catch (e) {
+      console.error(e);
+      say(String(e && e.message || e), 'err');
+    }
+  }
+
+  function render(ext, files) {
+    var card = document.createElement('div');
+    card.className = 'ext';
+    var head = document.createElement('header');
+    var icon = document.createElement('img');
+    var ip = ext.iconPath(48);
+    if (ip) icon.src = ext.resourceUrl(ip); else icon.hidden = true;
+    var info = document.createElement('div');
+    var nm = document.createElement('div'); nm.className = 'name'; nm.textContent = ext.name + ' ' + (ext.manifest.version || '');
+    var mt = document.createElement('div'); mt.className = 'meta'; mt.textContent = 'Manifest V' + ext.mv + ' · id ' + ext.id;
+    info.append(nm, mt); head.append(icon, info);
+    var actions = document.createElement('div'); actions.className = 'actions';
+    var make = document.createElement('button'); make.className = 'primary'; make.textContent = 'Build';
+    var note = document.createElement('div'); note.className = 'note';
+    var warn = document.createElement('ul'); warn.className = 'warn';
+    var unload = document.createElement('button'); unload.textContent = 'Unload';
+    unload.onclick = function () { ext.stop(); card.remove(); };
+    make.onclick = async function () {
+      make.disabled = true;
+      try {
+        var r = ExtShimBuilder.build(files, { runtimeSource: await getRuntimeSource() });
+        var a = document.createElement('a');
+        a.className = 'btn bm'; a.href = r.bookmarklet; a.textContent = r.display.name; a.title = 'Drag to the bookmarks bar';
+        a.onclick = function (e) { e.preventDefault(); };
+        var dl = document.createElement('button'); dl.textContent = 'Download .js';
+        dl.onclick = function () { download(r.slug + '.js', r.bundle); };
+        var us = document.createElement('button'); us.textContent = 'Download userscript';
+        us.onclick = function () { download(r.slug + '.user.js', r.userscript()); };
+        actions.replaceChildren(a, dl, us, unload);
+        note.textContent = 'Bookmarklet: ' + fmt(r.bookmarklet.length) + '. Drag it to the bookmarks bar.' +
+          (r.bookmarklet.length > 60000 ? ' Exceeds the Firefox bookmark limit (about 64 KB); use the .js file or the CLI loader bookmarklet there.' : '');
+        r.warnings.forEach(function (w) { var li = document.createElement('li'); li.textContent = w; warn.append(li); });
+      } catch (e) { note.textContent = 'Build failed: ' + e.message; make.disabled = false; }
+    };
+    actions.append(make, unload);
+    card.append(head, actions, note, warn);
+    $('loaded').prepend(card);
+  }
+
+  $('pickDir').onclick = function () { $('dirInput').click(); };
+  $('pickFile').onclick = function () { $('fileInput').click(); };
+  $('dirInput').onchange = function () { if (this.files.length) handle(this.files); this.value = ''; };
+  $('fileInput').onchange = function () { if (this.files.length) handle(this.files[0]); this.value = ''; };
+  var drop = $('drop');
+  ['dragenter', 'dragover'].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.add('over'); }); });
+  ['dragleave', 'drop'].forEach(function (t) { drop.addEventListener(t, function () { drop.classList.remove('over'); }); });
+  drop.addEventListener('drop', function (e) { e.preventDefault(); handle(e.dataTransfer); });
+  var q = new URLSearchParams(location.search).get('load');
+  if (q) handle(q);
+})();
+</script>
+</body>
+</html>

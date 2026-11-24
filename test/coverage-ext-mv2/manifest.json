@@ -1,0 +1,10 @@
+{
+  "manifest_version": 2,
+  "name": "API coverage probe MV2",
+  "version": "1.0",
+  "browser_action": { "default_title": "probe" },
+  "page_action": { "default_title": "probe page action" },
+  "sidebar_action": { "default_panel": "page.html" },
+  "background": { "scripts": ["bg.js"] },
+  "permissions": ["tabs", "<all_urls>"]
+}

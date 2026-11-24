@@ -1,0 +1,46 @@
+{
+  "name": "extshim",
+  "version": "1.0.0",
+  "description": "Run Chrome and Firefox extensions in a web page as a script, bookmarklet or userscript.",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "webextension",
+    "chrome-extension",
+    "bookmarklet",
+    "userscript",
+    "polyfill",
+    "manifest-v3"
+  ],
+  "bin": {
+    "extshim": "src/cli/extshim.js"
+  },
+  "main": "dist/extshim.js",
+  "files": [
+    "src",
+    "scripts",
+    "dist",
+    "playground",
+    "examples",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node test/unit.mjs && python3 test/e2e.py",
+    "test:unit": "node test/unit.mjs",
+    "test:e2e": "python3 test/e2e.py",
+    "inventory": "node scripts/api-inventory.cjs ."
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "acorn": "^8.19.0",
+    "esbuild": "^0.28.2"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.3.7",
+    "@types/firefox-webext-browser": "^143.0.1",
+    "typescript": "^5.9.3"
+  }
+}
